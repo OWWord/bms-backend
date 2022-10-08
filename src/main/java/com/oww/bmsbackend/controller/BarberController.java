@@ -19,13 +19,12 @@ public class BarberController {
         this.service = service;
     }
 
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<List<Barber>> findAll() {
         List<Barber> barbers = service.findAll();
-        return !barbers.isEmpty() ?
-                ResponseEntity.ok(barbers) :
-                new ResponseEntity("Список барберов пуст",
-                        HttpStatus.NOT_FOUND);
+        return barbers.isEmpty() ?
+                ResponseEntity.notFound().build() :
+                ResponseEntity.ok(barbers);
     }
 
     @GetMapping("/{id}")
@@ -37,31 +36,32 @@ public class BarberController {
         return ResponseEntity.ok(barber.get());
     }
 
-    @PostMapping("/")
+    @PostMapping
     public ResponseEntity<Barber> create(@RequestBody Barber barber) {
         if (barber.getId() != 0) {
-            return new ResponseEntity("id генерируется автоматически", HttpStatus.NOT_ACCEPTABLE);
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
-        return ResponseEntity.ok(service.createBarber(barber));
+        service.createBarber(barber);
+        return ResponseEntity.ok(barber);
     }
 
-    @PutMapping("/")
+    @PutMapping
     public ResponseEntity<Barber> update(@RequestBody Barber barber) {
         if (barber.getId() == 0) {
-            return new ResponseEntity("не указан id", HttpStatus.NOT_ACCEPTABLE);
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
-        return ResponseEntity.ok(service.updateBarber(barber));
+        service.updateBarber(barber);
+        return ResponseEntity.ok(barber);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteById(@PathVariable("id") int id) {
+    public ResponseEntity<Barber> deleteById(@PathVariable("id") int id) {
         Optional<Barber> barber = service.findById(id);
         if (barber.isEmpty()) {
-            return new ResponseEntity("Удаление не произошло, нет id = " + id,
-                    HttpStatus.NOT_FOUND);
+            return ResponseEntity.notFound().build();
         }
         service.deleteById(id);
-        return new ResponseEntity("Barber with ID = " + id + " was deleted", HttpStatus.OK);
+        return ResponseEntity.ok(barber.get());
     }
 
 }
