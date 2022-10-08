@@ -3,6 +3,8 @@ package com.oww.bmsbackend.entity;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 
 import javax.persistence.*;
 import java.util.Objects;
