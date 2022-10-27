@@ -1,0 +1,11 @@
+version: '3.5'
+
+services:
+  db_haircutbookingsystem:
+    container_name: db_haircutbookingsystem
+    ports:
+      - "5430:5430"
+    environment:
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_USER=root
+    image: postgres:14.5
