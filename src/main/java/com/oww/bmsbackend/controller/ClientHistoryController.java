@@ -5,12 +5,10 @@ import com.oww.bmsbackend.service.ClientHistoryService;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -18,10 +16,10 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequestMapping(value = "/api/v1/history")
 public class ClientHistoryController {
 
-    private final ClientHistoryService service;
+    private final ClientHistoryService clientHistoryService;
 
-    public ClientHistoryController(ClientHistoryService service) {
-        this.service = service;
+    public ClientHistoryController(ClientHistoryService clientHistoryService) {
+        this.clientHistoryService = clientHistoryService;
     }
 
     @GetMapping
@@ -34,13 +32,10 @@ public class ClientHistoryController {
     @ApiResponse(
             responseCode = "404",
             description = "Данные в базе данных отсутствуют",
-            content = @Content(mediaType = "text")
+            content = @Content(mediaType = APPLICATION_JSON_VALUE)
     )
     public ResponseEntity<List<ClientHistory>> findAll() {
-        final List<ClientHistory> clientHistories = service.findAll();
-        return clientHistories.isEmpty() ?
-                ResponseEntity.notFound().build() :
-                ResponseEntity.ok(clientHistories);
+        return ResponseEntity.ok(clientHistoryService.findAll());
     }
 
     @GetMapping("/{id}")
@@ -53,13 +48,10 @@ public class ClientHistoryController {
     @ApiResponse(
             responseCode = "404",
             description = "По данному id данных не обнаружено",
-            content = @Content(mediaType = "text")
+            content = @Content(mediaType = APPLICATION_JSON_VALUE)
     )
     public ResponseEntity<ClientHistory> findById(@PathVariable int id) {
-        final Optional<ClientHistory> clientHistory = service.findById(id);
-        return clientHistory.isPresent() ?
-                ResponseEntity.ok(clientHistory.get()) :
-                ResponseEntity.notFound().build();
+        return ResponseEntity.ok(clientHistoryService.findById(id));
     }
 
     @PostMapping
@@ -72,12 +64,11 @@ public class ClientHistoryController {
     @ApiResponse(
             responseCode = "406",
             description = "Создать новую запись не удалось",
-            content = @Content(mediaType = "text")
+            content = @Content(mediaType = APPLICATION_JSON_VALUE)
     )
     public ResponseEntity<ClientHistory> createClientHistory(@RequestBody ClientHistory clientHistory) {
-        return clientHistory.getId() != 0 ?
-                ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build() :
-                ResponseEntity.ok(service.createClientHistory(clientHistory));
+        clientHistoryService.createClientHistory(clientHistory);
+        return ResponseEntity.ok(clientHistory);
     }
 
     @PutMapping
@@ -90,12 +81,11 @@ public class ClientHistoryController {
     @ApiResponse(
             responseCode = "406",
             description = "Обновить запись не удалось",
-            content = @Content(mediaType = "text")
+            content = @Content(mediaType = APPLICATION_JSON_VALUE)
     )
     public ResponseEntity<ClientHistory> updateClientHistory(@RequestBody ClientHistory clientHistory) {
-        return clientHistory.getId() == 0 ?
-                ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build() :
-                ResponseEntity.ok(service.createClientHistory(clientHistory));
+        clientHistoryService.updateClientHistory(clientHistory);
+        return ResponseEntity.ok(clientHistory);
     }
 
     @DeleteMapping("/{id}")
@@ -108,14 +98,10 @@ public class ClientHistoryController {
     @ApiResponse(
             responseCode = "404",
             description = "Данных по id не найдено",
-            content = @Content(mediaType = "text")
+            content = @Content(mediaType = APPLICATION_JSON_VALUE)
     )
     public ResponseEntity<ClientHistory> deleteById(@PathVariable int id) {
-        Optional<ClientHistory> clientHistory = service.findById(id);
-        if (clientHistory.isPresent()) {
-            service.deleteById(id);
-            return ResponseEntity.ok(clientHistory.get());
-        }
-        return ResponseEntity.notFound().build();
+        clientHistoryService.deleteById(id);
+        return ResponseEntity.ok().build();
     }
 }

@@ -18,10 +18,10 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequestMapping(value = "/api/v1/request")
 public class RequestController {
 
-    private final RequestService service;
+    private final RequestService requestService;
 
-    public RequestController(RequestService service) {
-        this.service = service;
+    public RequestController(RequestService requestService) {
+        this.requestService = requestService;
     }
 
     @GetMapping
@@ -34,13 +34,10 @@ public class RequestController {
     @ApiResponse(
             responseCode = "404",
             description = "Данные в базе данных отсутствуют",
-            content = @Content(mediaType = "text")
+            content = @Content(mediaType = APPLICATION_JSON_VALUE)
     )
     public ResponseEntity<List<Request>> findAll() {
-        final List<Request> requests = service.findAll();
-        return requests.isEmpty() ?
-                ResponseEntity.notFound().build() :
-                ResponseEntity.ok(requests);
+        return ResponseEntity.ok(requestService.findAll());
     }
 
     @GetMapping("/{id}")
@@ -53,14 +50,10 @@ public class RequestController {
     @ApiResponse(
             responseCode = "404",
             description = "По данному id данных не обнаружено",
-            content = @Content(mediaType = "text")
+            content = @Content(mediaType = APPLICATION_JSON_VALUE)
     )
     public ResponseEntity<Request> findById(@PathVariable int id) {
-        final Optional<Request> request = service.findById(id);
-        if (request.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(request.get());
+        return ResponseEntity.ok(requestService.findById(id));
     }
 
     @PostMapping
@@ -73,13 +66,10 @@ public class RequestController {
     @ApiResponse(
             responseCode = "406",
             description = "Создать новую запись не удалось",
-            content = @Content(mediaType = "text")
+            content = @Content(mediaType = APPLICATION_JSON_VALUE)
     )
     public ResponseEntity<Request> createRequest(@RequestBody Request request) {
-        if (request.getId() != 0) {
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
-        }
-        service.createRequest(request);
+        requestService.createRequest(request);
         return ResponseEntity.ok(request);
     }
 
@@ -93,13 +83,10 @@ public class RequestController {
     @ApiResponse(
             responseCode = "406",
             description = "Обновить запись не удалось",
-            content = @Content(mediaType = "text")
+            content = @Content(mediaType = APPLICATION_JSON_VALUE)
     )
     public ResponseEntity<Request> updateRequest(@RequestBody Request request) {
-        if (request.getId() == 0) {
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
-        }
-        service.updateRequest(request);
+        requestService.updateRequest(request);
         return ResponseEntity.ok(request);
     }
 
@@ -113,14 +100,10 @@ public class RequestController {
     @ApiResponse(
             responseCode = "404",
             description = "Данных по id не найдено",
-            content = @Content(mediaType = "text")
+            content = @Content(mediaType = APPLICATION_JSON_VALUE)
     )
     public ResponseEntity<Request> deleteById(@PathVariable int id) {
-        Optional<Request> request = service.findById(id);
-        if (request.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        service.deleteById(id);
-        return ResponseEntity.ok(request.get());
+        requestService.deleteById(id);
+        return ResponseEntity.ok().build();
     }
 }

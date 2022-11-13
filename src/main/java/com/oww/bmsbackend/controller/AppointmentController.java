@@ -1,18 +1,14 @@
 package com.oww.bmsbackend.controller;
 
 import com.oww.bmsbackend.entity.Appointment;
-import com.oww.bmsbackend.entity.Barber;
 import com.oww.bmsbackend.service.AppointmentService;
-import com.oww.bmsbackend.service.BarberService;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -20,13 +16,10 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequestMapping(value = "/api/v1/appointment")
 public class AppointmentController {
 
-    private AppointmentService service;
-    private BarberService barberService;
+    private final AppointmentService appointmentService;
 
-    public AppointmentController(AppointmentService service,
-                                 BarberService barberService) {
-        this.service = service;
-        this.barberService = barberService;
+    public AppointmentController(AppointmentService appointmentService) {
+        this.appointmentService = appointmentService;
     }
 
     @GetMapping
@@ -39,13 +32,10 @@ public class AppointmentController {
     @ApiResponse(
             responseCode = "404",
             description = "Данные в базе данных отсутствуют",
-            content = @Content(mediaType = "text")
+            content = @Content(mediaType = APPLICATION_JSON_VALUE)
     )
     public ResponseEntity<List<Appointment>> findAll() {
-        List<Appointment> appointments = service.findAll();
-        return appointments.isEmpty() ?
-                ResponseEntity.notFound().build() :
-                ResponseEntity.ok(appointments);
+        return ResponseEntity.ok(appointmentService.findAll());
     }
 
     @GetMapping("/{id}")
@@ -58,14 +48,10 @@ public class AppointmentController {
     @ApiResponse(
             responseCode = "404",
             description = "По данному id данных не обнаружено",
-            content = @Content(mediaType = "text")
+            content = @Content(mediaType = APPLICATION_JSON_VALUE)
     )
     public ResponseEntity<Appointment> findById(@PathVariable int id) {
-        Optional<Appointment> appointment = service.findById(id);
-        if (appointment.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(appointment.get());
+        return ResponseEntity.ok(appointmentService.findById(id));
     }
 
     @PostMapping
@@ -78,18 +64,10 @@ public class AppointmentController {
     @ApiResponse(
             responseCode = "406",
             description = "Создать новую запись не удалось",
-            content = @Content(mediaType = "text")
+            content = @Content(mediaType = APPLICATION_JSON_VALUE)
     )
     public ResponseEntity<Appointment> createAppointment(@RequestBody Appointment appointment) {
-        Optional<Barber> barber = barberService.
-                findById(appointment.getBarber().getId());
-        if (barber.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
-        }
-        if (appointment.getId() != 0) {
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
-        }
-        service.createAppointment(appointment);
+        appointmentService.createAppointment(appointment);
         return ResponseEntity.ok(appointment);
     }
 
@@ -103,18 +81,10 @@ public class AppointmentController {
     @ApiResponse(
             responseCode = "406",
             description = "Обновить запись не удалось",
-            content = @Content(mediaType = "text")
+            content = @Content(mediaType = APPLICATION_JSON_VALUE)
     )
     public ResponseEntity<Appointment> updateAppointment(@RequestBody Appointment appointment) {
-        Optional<Barber> barber = barberService.
-                findById(appointment.getBarber().getId());
-        if (barber.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
-        }
-        if (appointment.getId() == 0) {
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
-        }
-        service.updateAppointment(appointment);
+        appointmentService.updateAppointment(appointment);
         return ResponseEntity.ok(appointment);
     }
 
@@ -128,14 +98,10 @@ public class AppointmentController {
     @ApiResponse(
             responseCode = "404",
             description = "Данных по id не найдено",
-            content = @Content(mediaType = "text")
+            content = @Content(mediaType = APPLICATION_JSON_VALUE)
     )
     public ResponseEntity<Appointment> deleteAppointment(@PathVariable int id) {
-        Optional<Appointment> appointment = service.findById(id);
-        if (appointment.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        service.deleteById(id);
-        return ResponseEntity.ok(appointment.get());
+        appointmentService.deleteById(id);
+        return ResponseEntity.ok().build();
     }
 }

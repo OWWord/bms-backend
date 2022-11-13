@@ -9,7 +9,7 @@ public interface AppointmentService {
 
     List<Appointment> findAll();
 
-    Optional<Appointment> findById(int id);
+    Appointment findById(int id);
 
     Appointment createAppointment(Appointment appointment);
 
