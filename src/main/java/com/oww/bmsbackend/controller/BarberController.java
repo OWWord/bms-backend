@@ -5,12 +5,10 @@ import com.oww.bmsbackend.service.BarberService;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -18,10 +16,10 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequestMapping(value = "/api/v1/barbers")
 public class BarberController {
 
-    private final BarberService service;
+    private final BarberService barberService;
 
-    public BarberController(BarberService service) {
-        this.service = service;
+    public BarberController(BarberService barberService) {
+        this.barberService = barberService;
     }
 
     @GetMapping
@@ -34,13 +32,10 @@ public class BarberController {
     @ApiResponse(
             responseCode = "404",
             description = "Данные в базе данных отсутствуют",
-            content = @Content(mediaType = "text")
+            content = @Content(mediaType = APPLICATION_JSON_VALUE)
     )
     public ResponseEntity<List<Barber>> findAll() {
-        List<Barber> barbers = service.findAll();
-        return barbers.isEmpty() ?
-                ResponseEntity.notFound().build() :
-                ResponseEntity.ok(barbers);
+        return ResponseEntity.ok(barberService.findAll());
     }
 
     @GetMapping("/{id}")
@@ -53,14 +48,10 @@ public class BarberController {
     @ApiResponse(
             responseCode = "404",
             description = "По данному id данных не обнаружено",
-            content = @Content(mediaType = "text")
+            content = @Content(mediaType = APPLICATION_JSON_VALUE)
     )
     public ResponseEntity<Barber> findById(@PathVariable("id") int id) {
-        final Optional<Barber> barber = service.findById(id);
-        if (barber.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(barber.get());
+        return ResponseEntity.ok(barberService.findById(id));
     }
 
     @PostMapping
@@ -73,13 +64,10 @@ public class BarberController {
     @ApiResponse(
             responseCode = "406",
             description = "Создать новую запись не удалось",
-            content = @Content(mediaType = "text")
+            content = @Content(mediaType = APPLICATION_JSON_VALUE)
     )
     public ResponseEntity<Barber> create(@RequestBody Barber barber) {
-        if (barber.getId() != 0) {
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
-        }
-        service.createBarber(barber);
+        barberService.createBarber(barber);
         return ResponseEntity.ok(barber);
     }
 
@@ -93,13 +81,10 @@ public class BarberController {
     @ApiResponse(
             responseCode = "406",
             description = "Обновить запись не удалось",
-            content = @Content(mediaType = "text")
+            content = @Content(mediaType = APPLICATION_JSON_VALUE)
     )
     public ResponseEntity<Barber> update(@RequestBody Barber barber) {
-        if (barber.getId() == 0) {
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
-        }
-        service.updateBarber(barber);
+        barberService.updateBarber(barber);
         return ResponseEntity.ok(barber);
     }
 
@@ -113,14 +98,10 @@ public class BarberController {
     @ApiResponse(
             responseCode = "404",
             description = "Данных по id не найдено",
-            content = {@Content(mediaType = "text")}
+            content = {@Content(mediaType = APPLICATION_JSON_VALUE)}
     )
     public ResponseEntity<Barber> deleteById(@PathVariable("id") int id) {
-        Optional<Barber> barber = service.findById(id);
-        if (barber.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        service.deleteById(id);
-        return ResponseEntity.ok(barber.get());
+        barberService.deleteById(id);
+        return ResponseEntity.ok().build();
     }
 }

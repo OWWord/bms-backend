@@ -9,7 +9,7 @@ public interface RequestService {
 
     List<Request> findAll();
 
-    Optional<Request> findById(int id);
+    Request findById(int id);
 
     Request createRequest(Request request);
 

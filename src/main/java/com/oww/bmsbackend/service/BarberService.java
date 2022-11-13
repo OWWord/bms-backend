@@ -9,7 +9,7 @@ public interface BarberService {
 
     List<Barber> findAll();
 
-    Optional<Barber> findById(int id);
+    Barber findById(int id);
 
     Barber createBarber(Barber barber);
 

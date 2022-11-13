@@ -9,7 +9,7 @@ public interface ClientHistoryService {
 
     List<ClientHistory> findAll();
 
-    Optional<ClientHistory> findById(int id);
+    ClientHistory findById(int id);
 
     ClientHistory createClientHistory(ClientHistory clientHistory);
 
